@@ -33,6 +33,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import android.util.Log
 
 class UserUpdateActivity : ComponentActivity() {
 
@@ -41,18 +42,19 @@ class UserUpdateActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dbHelper = DatabaseHelper(this)
 
+        this.dbHelper = DatabaseHelper(this)
         // Obtener el ID del usuario del intent
-        userId = intent.getLongExtra("USER_ID", -1)
-        if (userId == -1L) {
+        this.userId = intent.getLongExtra("USER_ID", -1)
+        Log.d("UserUpdateActivity", "User ID: $userId") // Para depuración
+        if (this.userId == -1L) {
             // Manejar el error si no se proporciona el ID
             this.finish() // Cerrar la actividad si no hay ID
             return
         }
 
         setContent {
-            UserUpdateScreen(dbHelper = dbHelper, userId = userId, this)
+            UserUpdateScreen(dbHelper = this.dbHelper, userId = this.userId, this)
         }
     }
 
