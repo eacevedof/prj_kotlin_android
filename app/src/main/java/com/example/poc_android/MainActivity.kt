@@ -34,6 +34,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.lifecycleScope
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -202,19 +203,8 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
                         accessPassword = passwordState.value.text
                     )
 
-                    lifecycleScope.launch(Dispatchers.IO) { // Usar IO dispatcher para operaciones de BD
-                        val id = dbHelper.createUser(newUser)
-                        withContext(Dispatchers.Main) { // Volver al hilo principal para la UI
-                            if (id > 0) {
-                                // Mostrar un mensaje de éxito
-                                println("Usuario guardado con ID: $id") // Esto se verá en el Logcat
-                                // Podrías mostrar un Toast o un diálogo aquí
-                            } else {
-                                // Mostrar un mensaje de error
-                                println("Error al guardar el usuario")
-                            }
-                        }
-                    }
+
+
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
