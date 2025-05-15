@@ -101,12 +101,13 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
                     usernameState.value = TextFieldValue(user.username)
                     passwordState.value =
                         TextFieldValue(user.accessPassword) // Cargar la contraseña
-                } else {
+                }
+                else {
                     // Manejar el caso en que el usuario no existe
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("Usuario no encontrado")
                     }
-                        context.finish() // Cerrar la actividad
+                    context.finish() // Cerrar la actividad
                 }
             }
         }
@@ -295,32 +296,6 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
             }
         )
     }
-}
-
-private fun DatabaseHelper.getUserById(userId: Long): User? {
-    val db = this.readableDatabase
-    val cursor = db.query(
-        "users",
-        arrayOf("id", "name", "birthDate", "email", "phone", "username", "accessPassword"),
-        "id = ?",
-        arrayOf(userId.toString()),
-        null, null, null
-    )
-    var user: User? = null
-    if (cursor.moveToFirst()) {
-        user = User(
-            id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
-            uuid = cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
-            name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
-            birthDate = Date(cursor.getLong(cursor.getColumnIndexOrThrow("birthDate"))),
-            email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
-            phone = cursor.getString(cursor.getColumnIndexOrThrow("phone")),
-            username = cursor.getString(cursor.getColumnIndexOrThrow("username")),
-            accessPassword = cursor.getString(cursor.getColumnIndexOrThrow("accessPassword"))
-        )
-    }
-    cursor.close()
-    return user
 }
 
 @Preview(showBackground = true)
