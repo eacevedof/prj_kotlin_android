@@ -1,5 +1,6 @@
 package com.example.poc_android
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,8 +52,11 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -69,7 +73,7 @@ class UserListActivity : ComponentActivity() {
         dbHelper = DatabaseHelper(this)
 
         setContent {
-            UserListScreen(dbHelper = dbHelper)
+            UserListScreen(dbHelper = dbHelper, this) // Pass the context
         }
     }
 
@@ -81,7 +85,7 @@ class UserListActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListScreen(dbHelper: DatabaseHelper) {
+fun UserListScreen(dbHelper: DatabaseHelper, context: ComponentActivity) { // Receive context
     // Estado para la lista de usuarios
     val users = remember { mutableStateListOf<User>() }
     val coroutineScope = rememberCoroutineScope()
@@ -99,7 +103,15 @@ fun UserListScreen(dbHelper: DatabaseHelper) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Lista de Usuarios") }) }
+        topBar = { TopAppBar(title = { Text("Lista de Usuarios") }) },
+        floatingActionButton = { // Add FAB
+            FloatingActionButton(onClick = {
+                val intent = Intent(context, MainActivity::class.java) // Use the context
+                context.startActivity(intent)
+            }) {
+                Icon(imageVector = androidx.compose.material.icons.Icons.Filled.Add, contentDescription = "Add User")
+            }
+        }
     ) { paddingValues ->
         if (users.isEmpty()) {
             // Mostrar un mensaje si no hay usuarios
@@ -170,6 +182,6 @@ fun UserListPreview() {
 
     // Muestra la lista de usuarios de ejemplo en la vista previa
     Column {
-        UserListScreen(dbHelper = tempDbHelper)
+        UserListScreen(dbHelper = tempDbHelper, context =  (context as ComponentActivity) )
     }
 }
