@@ -85,7 +85,7 @@ fun UserFormScreen(dbHelper: DatabaseHelper, context: ComponentActivity) { // Re
     )
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Formulario de Usuario") }) },
+        topBar = { TopAppBar(title = { Text("Crear usuario") }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = { // Botón en la parte inferior
             Button(
