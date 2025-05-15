@@ -70,7 +70,7 @@ class UserUpdateActivity : ComponentActivity() {
 @Composable
 fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentActivity) {
 
-    Log.d("UserUpdateActivity.UserUpdateScreen", "User ID: $userId")
+    Log.d("UserUpdateActivity.UserUpdateScreen", "user-id: $userId")
 
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }

@@ -164,7 +164,7 @@ fun UserCard(user: User, context: ComponentActivity) { // Recibir contexto
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "Nombre: ${user.name}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Nombre:${user.id} ${user.name}", style = MaterialTheme.typography.bodyLarge)
             Text(
                 text = "Fecha de Nacimiento: ${
                     SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.birthDate)

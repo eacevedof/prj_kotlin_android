@@ -132,6 +132,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         )
 
         if (cursor.count == 0) {
+            cursor.close()
             return userList
         }
 
@@ -191,7 +192,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     }
 
     private fun Cursor.getUserFromCursor(): User {
-        val id = getLong(getColumnIndexOrThrow(COLUMN_NAME))
+        val id = getLong(getColumnIndexOrThrow(COLUMN_ID))
         val uuid = getString(getColumnIndexOrThrow(COLUMN_UUID))
         val name = getString(getColumnIndexOrThrow(COLUMN_NAME))
         val birthDateString = getString(getColumnIndexOrThrow(COLUMN_BIRTH_DATE))
