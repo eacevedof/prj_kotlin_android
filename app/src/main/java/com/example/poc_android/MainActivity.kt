@@ -1,5 +1,6 @@
 package com.example.poc_android
 
+import android.content.ComponentCallbacks2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -90,5 +91,12 @@ class MainActivity : ComponentActivity() {
     private fun deleteUserExample() {
         val rowsAffected = dbHelper.deleteUser("your_user_uuid_here") // Replace with the UUID to delete
         Log.d("CRUD", "Rows affected by delete: $rowsAffected")
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
+            // Libera recursos pesados aquí
+        }
     }
 }
