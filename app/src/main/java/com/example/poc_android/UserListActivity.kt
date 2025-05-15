@@ -63,10 +63,20 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.ActivityResult
 
 class UserListActivity : ComponentActivity() {
 
     private lateinit var dbHelper: DatabaseHelper
+    //ActivityResultLauncher
+    private val editUserLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                // Actualizar la lista de usuarios después de la edición
+                loadUsers()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("UserListActivity", "onCreate called")
@@ -82,133 +92,147 @@ class UserListActivity : ComponentActivity() {
         super.onDestroy()
         dbHelper.close()
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UserListScreen(dbHelper: DatabaseHelper, context: ComponentActivity) { // Recibir contexto
-    // Estado para la lista de usuarios
-    val users = remember { mutableStateListOf<User>() }
-    val coroutineScope = rememberCoroutineScope()
-
-    // Cargar los usuarios desde la base de datos al inicio
-    LaunchedEffect(Unit) {
-        coroutineScope.launch(Dispatchers.IO) {
-            Log.d("UserListActivity", "UserListScreen 1")
+    private fun loadUsers() {
+        lifecycleScope.launch(Dispatchers.IO) {
             val userList = dbHelper.getAllUsers()
-            Log.d("UserListActivity", "UserListScreen 2")
             withContext(Dispatchers.Main) {
+                users.clear()
                 users.addAll(userList)
             }
         }
     }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Lista de Usuarios") }) },
-        floatingActionButton = { // Botón flotante para añadir usuarios
-            FloatingActionButton(onClick = {
-                val intent = Intent(context, CreateUserActivity::class.java) // Usar el contexto
-                context.startActivity(intent)
-            }) {
-                Icon(imageVector = androidx.compose.material.icons.Icons.Filled.Add, contentDescription = "Add User")
+    // Estado para la lista de usuarios
+    val users = mutableStateListOf<User>()
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun UserListScreen(dbHelper: DatabaseHelper, context: ComponentActivity) { // Recibir contexto
+        val coroutineScope = rememberCoroutineScope()
+
+
+        // Cargar los usuarios desde la base de datos al inicio
+        LaunchedEffect(Unit) {
+            coroutineScope.launch(Dispatchers.IO) {
+                Log.d("UserListActivity", "UserListScreen 1")
+                val userList = dbHelper.getAllUsers()
+                Log.d("UserListActivity", "UserListScreen 2")
+                withContext(Dispatchers.Main) {
+                    users.addAll(userList)
+                }
             }
         }
-    ) { paddingValues ->
-        if (users.isEmpty()) {
-            // Mostrar un mensaje si no hay usuarios
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "No hay usuarios registrados.",
-                    style = TextStyle(
-                        fontFamily = FontFamily.SansSerif,
-                        fontSize = 18.sp
-                    ),
-                    color = Color.Gray
-                )
+
+        Scaffold(
+            topBar = { TopAppBar(title = { Text("Lista de Usuarios") }) },
+            floatingActionButton = { // Botón flotante para añadir usuarios
+                FloatingActionButton(onClick = {
+                    val intent = Intent(context, CreateUserActivity::class.java) // Usar el contexto
+                    context.startActivity(intent)
+                }) {
+                    Icon(imageVector = androidx.compose.material.icons.Icons.Filled.Add, contentDescription = "Add User")
+                }
             }
-        } else {
-            // Mostrar la lista de usuarios
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp) // Espacio entre elementos
-            ) {
-                items(users) { user ->
-                    UserCard(user = user, context = context) // Pasar el contexto a UserCard
+        ) { paddingValues ->
+            if (users.isEmpty()) {
+                // Mostrar un mensaje si no hay usuarios
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "No hay usuarios registrados.",
+                        style = TextStyle(
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 18.sp
+                        ),
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                // Mostrar la lista de usuarios
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp) // Espacio entre elementos
+                ) {
+                    items(users) { user ->
+                        UserCard(user = user, context = context) // Pasar el contexto a UserCard
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun UserCard(user: User, context: ComponentActivity) { // Recibir contexto
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { // Añadir un click listener a la Card
-                val intent = Intent(context, UserUpdateActivity::class.java)
-                intent.putExtra("USER_ID", user.id) // Pasar el ID del usuario
-                context.startActivity(intent)
-            },
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+    @Composable
+    fun UserCard(user: User, context: ComponentActivity) { // Recibir contexto
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { // Añadir un click listener a la Card
+                    val intent = Intent(context, UserUpdateActivity::class.java)
+                    intent.putExtra("USER_ID", user.id) // Pasar el ID del usuario
+                    //context.startActivity(intent)
+                    editUserLauncher.launch(intent)
+                },
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
         ) {
-            Text(text = "Nombre:${user.id} ${user.name}", style = MaterialTheme.typography.bodyLarge)
-            Text(
-                text = "Fecha de Nacimiento: ${
-                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.birthDate)
-                }", style = MaterialTheme.typography.bodyMedium
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(text = "Nombre:${user.id} ${user.name}", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = "Fecha de Nacimiento: ${
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.birthDate)
+                    }", style = MaterialTheme.typography.bodyMedium
+                )
+                Text(text = "Email: ${user.email}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Teléfono: ${user.phone}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Nombre de Acceso: ${user.username}", style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun UserListPreview() {
+        // Para la vista previa, necesitas pasar una instancia de DatabaseHelper.
+        // Puedes usar una instancia temporal, pero no mostrará datos reales de la base de datos.
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val tempDbHelper = remember { DatabaseHelper(context) }
+
+        // Crea datos de muestra para la vista previa
+        val sampleUsers = listOf(
+            User(
+                name = "John Doe",
+                birthDate = Date(),
+                email = "john.doe@example.com",
+                phone = "1234567890",
+                username = "johndoe",
+                accessPassword = "password",
+                id = 1
+            ),
+            User(
+                name = "Jane Smith",
+                birthDate = Date(),
+                email = "jane.smith@example.com",
+                phone = "9876543210",
+                username = "janesmith",
+                accessPassword = "password",
+                id = 2
             )
-            Text(text = "Email: ${user.email}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Teléfono: ${user.phone}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Nombre de Acceso: ${user.username}", style = MaterialTheme.typography.bodyMedium)
+        )
+
+        // Muestra la lista de usuarios de ejemplo en la vista previa
+        Column {
+            UserListScreen(dbHelper = tempDbHelper, context = (context as ComponentActivity))
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun UserListPreview() {
-    // Para la vista previa, necesitas pasar una instancia de DatabaseHelper.
-    // Puedes usar una instancia temporal, pero no mostrará datos reales de la base de datos.
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val tempDbHelper = remember { DatabaseHelper(context) }
-
-    // Crea datos de muestra para la vista previa
-    val sampleUsers = listOf(
-        User(
-            name = "John Doe",
-            birthDate = Date(),
-            email = "john.doe@example.com",
-            phone = "1234567890",
-            username = "johndoe",
-            accessPassword = "password",
-            id = 1
-        ),
-        User(
-            name = "Jane Smith",
-            birthDate = Date(),
-            email = "jane.smith@example.com",
-            phone = "9876543210",
-            username = "janesmith",
-            accessPassword = "password",
-            id = 2
-        )
-    )
-
-    // Muestra la lista de usuarios de ejemplo en la vista previa
-    Column {
-        UserListScreen(dbHelper = tempDbHelper, context = (context as ComponentActivity))
-    }
-}
