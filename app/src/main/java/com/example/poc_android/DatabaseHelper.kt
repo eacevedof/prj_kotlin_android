@@ -19,6 +19,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
 
         // Table and Column names
         private const val TABLE_USERS = "users"
+
+        private const val COLUMN_ID = "id"
         private const val COLUMN_UUID = "uuid"
         private const val COLUMN_NAME = "name"
         private const val COLUMN_BIRTH_DATE = "birth_date"
@@ -32,7 +34,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createTableQuery =
-            "CREATE TABLE $TABLE_USERS ($COLUMN_UUID TEXT PRIMARY KEY, " +
+            "CREATE TABLE $TABLE_USERS (" +
+                    "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "$COLUMN_UUID TEXT UNIQUE, " +
                     "$COLUMN_NAME TEXT, " +
                     "$COLUMN_BIRTH_DATE TEXT, " +
                     "$COLUMN_EMAIL TEXT, " +
@@ -72,7 +76,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
             arrayOf(uuid),
             null, null, null
         )
-        if (cursor == null) {
+        if (cursor.count == 0) {
             return null
         }
 
@@ -80,7 +84,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         if (cursor.moveToFirst()) {
             user = cursor.getUserFromCursor()
         }
-        cursor?.close()
+        cursor.close()
         db.close()
         return user
     }
@@ -114,6 +118,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     fun updateUser(user: User): Int {
         val db = this.writableDatabase
         val values = ContentValues().apply {
+            put(COLUMN_UUID, user.uuid)
             put(COLUMN_NAME, user.name)
             put(COLUMN_BIRTH_DATE, DATE_FORMAT.format(user.birthDate))
             put(COLUMN_EMAIL, user.email)
@@ -124,14 +129,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         val rowsAffected = db.update(
             TABLE_USERS,
             values,
-            "$COLUMN_UUID=?",
-            arrayOf(user.uuid)
+            "$COLUMN_ID=?",
+            arrayOf(user.id.toString())
         )
         db.close()
         return rowsAffected
     }
 
-    fun deleteUser(uuid: String): Int {
+    fun deleteUserByUuid(uuid: String): Int {
         val db = this.writableDatabase
         val rowsAffected = db.delete(
             TABLE_USERS,
@@ -142,7 +147,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         return rowsAffected
     }
 
+    fun deleteUserById(userId: Long): Int {
+        val db = this.writableDatabase
+        val rowsAffected = db.delete(
+            TABLE_USERS,
+            "$COLUMN_UUID=?",
+            arrayOf(userId.toString())
+        )
+        db.close()
+        return rowsAffected
+    }
+
     private fun Cursor.getUserFromCursor(): User {
+        val id = getLong(getColumnIndexOrThrow(COLUMN_NAME))
         val uuid = getString(getColumnIndexOrThrow(COLUMN_UUID))
         val name = getString(getColumnIndexOrThrow(COLUMN_NAME))
         val birthDateString = getString(getColumnIndexOrThrow(COLUMN_BIRTH_DATE))
@@ -151,6 +168,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         val phone = getString(getColumnIndexOrThrow(COLUMN_PHONE))
         val username = getString(getColumnIndexOrThrow(COLUMN_USERNAME))
         val accessPassword = getString(getColumnIndexOrThrow(COLUMN_ACCESS_PASSWORD))
-        return User(uuid, name, birthDate, email, phone, username, accessPassword)
+        return User(id, uuid, name, birthDate, email, phone, username, accessPassword)
     }
 }
