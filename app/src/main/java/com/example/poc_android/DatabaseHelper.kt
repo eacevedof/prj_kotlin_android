@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHelper(context: Context) : SQLiteOpenHelper(
+    context, DATABASE_NAME, null, DATABASE_VERSION
+) {
 
     companion object {
         private const val DATABASE_NAME = "UserDatabase.db"
@@ -65,13 +67,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.readableDatabase
         val cursor = db.query(
             TABLE_USERS,
-            null, // All columns
+            null, // Todas las columnas
             "$COLUMN_UUID=?",
             arrayOf(uuid),
             null, null, null
         )
         var user: User? = null
-        cursor?.moveToFirst()?.let {
+        if (cursor != null && cursor.moveToFirst()) {
             user = cursor.getUserFromCursor()
         }
         cursor?.close()
