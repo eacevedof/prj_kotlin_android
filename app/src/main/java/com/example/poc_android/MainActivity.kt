@@ -48,6 +48,7 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
 
@@ -99,10 +100,12 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
         yearRange = 1900..2025 // Ahora incluye 2025
     )
 
-
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Formulario de Usuario") }) }
+        topBar = { TopAppBar(title = { Text("Formulario de Usuario") }) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
+
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -225,15 +228,19 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
                     passwordState.value = TextFieldValue("")
                     birthDateState.value = LocalDate.of(2000, 1, 1) // Restablecer a la fecha predeterminada
 
+                    Log.d("info", "Usuario guardado correctamente ${newId}")
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar("Usuario guardado correctamente ${newId}")
                     }
+
+
 
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Guardar Usuario")
             }
+
         }
     }
 }
