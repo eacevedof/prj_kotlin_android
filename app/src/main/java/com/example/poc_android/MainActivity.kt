@@ -229,7 +229,6 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
                         snackbarHostState.showSnackbar("Usuario guardado correctamente ${newId}")
                     }
 
-
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
