@@ -1,5 +1,6 @@
 package com.example.poc_android
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,7 +35,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import android.util.Log
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 
 class UserUpdateActivity : ComponentActivity() {
@@ -52,6 +52,9 @@ class UserUpdateActivity : ComponentActivity() {
         if (this.userId == -1L) {
             // Manejar el error si no se proporciona el ID
             this.finish() // Cerrar la actividad si no hay ID
+            //voler a mostrar la lista de usuarios
+            val intent = Intent(this, UserListActivity::class.java) // Usar el contexto
+            this.startActivity(intent)
             return
         }
 
@@ -70,7 +73,7 @@ class UserUpdateActivity : ComponentActivity() {
 @Composable
 fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentActivity) {
 
-    Log.d("UserUpdateActivity.UserUpdateScreen", "user-id: $userId")
+    Log.d("UserUpdateActivity", "UserUpdateScreen user-id: $userId")
 
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -106,9 +109,11 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
     val showDeleteDialog = rememberSaveable { mutableStateOf(false) }
 
     // Cargar los datos del usuario al inicio
+    Log.d("UserUpdateActivity", "LaunchedEffect user-id: $userId")
     LaunchedEffect(userId) {
         coroutineScope.launch(Dispatchers.IO) {
-            val user = dbHelper.getUserById(userId)
+            val user = dbHelper.getUserByUserId(userId)
+
             withContext(Dispatchers.Main) {
                 if (user != null) {
                     nameState.value = TextFieldValue(user.name)

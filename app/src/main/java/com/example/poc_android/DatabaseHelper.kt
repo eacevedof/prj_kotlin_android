@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.util.Log
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION
@@ -90,7 +91,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         return user
     }
 
-    fun getUserById(userId: Long): User? {
+    fun getUserByUserId(userId: Long): User? {
         val db = this.readableDatabase
         val cursor = db.query(
             TABLE_USERS,
@@ -101,23 +102,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         )
         if (cursor.count == 0) {
             cursor.close()
+            Log.d("DatabaseHelper", "No user found with user-id: $userId")
             return null
         }
 
-        var user: User? = null
-        if (cursor.moveToFirst()) {
-            user = User(
-                id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
-                uuid = cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
-                name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
-                birthDate = Date(cursor.getLong(cursor.getColumnIndexOrThrow("birthDate"))),
-                email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
-                phone = cursor.getString(cursor.getColumnIndexOrThrow("phone")),
-                username = cursor.getString(cursor.getColumnIndexOrThrow("username")),
-                accessPassword = cursor.getString(cursor.getColumnIndexOrThrow("accessPassword"))
-            )
-        }
+        val user = User(
+            id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+            uuid = cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
+            name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
+            birthDate = Date(cursor.getLong(cursor.getColumnIndexOrThrow("birthDate"))),
+            email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
+            phone = cursor.getString(cursor.getColumnIndexOrThrow("phone")),
+            username = cursor.getString(cursor.getColumnIndexOrThrow("username")),
+            accessPassword = cursor.getString(cursor.getColumnIndexOrThrow("accessPassword"))
+        )
+
         cursor.close()
+        Log.d("DatabaseHelper", "user-id: $userId loaded")
         return user
     }
 
