@@ -34,6 +34,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import android.util.Log
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 
 class UserUpdateActivity : ComponentActivity() {
 
@@ -46,7 +48,7 @@ class UserUpdateActivity : ComponentActivity() {
         this.dbHelper = DatabaseHelper(this)
         // Obtener el ID del usuario del intent
         this.userId = intent.getLongExtra("USER_ID", -1)
-        Log.d("UserUpdateActivity", "User ID: $userId") // Para depuración
+        Log.d("UserUpdateActivity.onCreate", "User ID: $userId") // Para depuración
         if (this.userId == -1L) {
             // Manejar el error si no se proporciona el ID
             this.finish() // Cerrar la actividad si no hay ID
@@ -67,17 +69,32 @@ class UserUpdateActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentActivity) {
+
+    Log.d("UserUpdateActivity.UserUpdateScreen", "User ID: $userId")
+
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Estado para los campos del formulario
-    val nameState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val birthDateState = rememberSaveable { mutableStateOf(LocalDate.of(2000, 1, 1)) }
-    val emailState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val phoneState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val usernameState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val passwordState = rememberSaveable { mutableStateOf(TextFieldValue("")) }  // Estado para la contraseña
+    val TextFieldValueSaver = listSaver<TextFieldValue, Any>(
+        save = { listOf(it.text, it.selection.start, it.selection.end, it.composition?.start, it.composition?.end) as List<Any> },
+        restore = {
+            TextFieldValue(
+                text = it[0] as String,
+                selection = androidx.compose.ui.text.TextRange(it[1] as Int, it[2] as Int),
+                composition = if (it[3] != null && it[4] != null)
+                    androidx.compose.ui.text.TextRange(it[3] as Int, it[4] as Int)
+                else null
+            )
+        }
+    )
 
+    // Estado para los campos del formulario
+    val birthDateState = rememberSaveable { mutableStateOf(LocalDate.of(2000, 1, 1)) }
+    val nameState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val emailState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val phoneState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val usernameState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val passwordState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
     // Para el DatePicker
     val openDialog = rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
