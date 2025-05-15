@@ -4,6 +4,7 @@ import java.util.Date
 import java.util.UUID
 
 data class User(
+    val id: Long = 0,
     val uuid: String = UUID.randomUUID().toString(),
     var name: String,
     var birthDate: Date,
