@@ -185,11 +185,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         return rowsAffected
     }
 
-    fun deleteUserById(userId: Long): Int {
+    fun deleteUserByUserId(userId: Long): Int {
         val db = this.writableDatabase
         val rowsAffected = db.delete(
             TABLE_USERS,
-            "$COLUMN_UUID=?",
+            "$COLUMN_ID=?",
             arrayOf(userId.toString())
         )
         db.close()

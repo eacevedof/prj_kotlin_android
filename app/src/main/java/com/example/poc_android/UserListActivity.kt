@@ -45,6 +45,7 @@ class UserListActivity : ComponentActivity() {
     private val editUserLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result ->
+            Log.d("UserListActivity", "Result: ${result.resultCode}")
             if (result.resultCode == RESULT_OK) {
                 // Actualizar la lista de usuarios después de la edición
                 loadUsers()

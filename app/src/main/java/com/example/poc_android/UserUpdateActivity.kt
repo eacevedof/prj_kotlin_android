@@ -175,8 +175,8 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar("Usuario actualizado")
                                 }
-                                val intent = Intent(context, UserListActivity::class.java) // Usar el contexto
-                                context.startActivity(intent)
+                                val intentUserList = Intent(context, UserListActivity::class.java) // Usar el contexto
+                                context.startActivity(intentUserList)
                                 context.finish() // Cerrar la actividad después de la actualización
                             }
                         }
@@ -308,13 +308,15 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
                 Button(
                     onClick = {
                         coroutineScope.launch(Dispatchers.IO) {
-                            dbHelper.deleteUserById(userId)
+                            dbHelper.deleteUserByUserId(userId)
                             withContext(Dispatchers.Main) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar("Usuario eliminado")
                                 }
                                 showDeleteDialog.value = false
-                                    context.finish() // Cerrar la actividad después de la eliminación
+                                val intentUserList = Intent(context, UserListActivity::class.java)
+                                context.startActivity(intentUserList)
+                                context.finish()
                             }
                         }
                     }
