@@ -31,6 +31,7 @@ import java.util.Locale
 import android.widget.DatePicker
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.ui.window.Dialog
@@ -44,6 +45,9 @@ import java.util.Date
 import java.util.TimeZone
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -67,6 +71,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserFormScreen(dbHelper: DatabaseHelper) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val TextFieldValueSaver = listSaver<TextFieldValue, Any>(
         save = { listOf(it.text, it.selection.start, it.selection.end) },
@@ -93,13 +99,6 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
         yearRange = 1900..2025 // Ahora incluye 2025
     )
 
-    // Para el TimePicker (aunque no se usa directamente en el ejemplo de la fecha de nacimiento, se deja como referencia)
-    val openTimeDialog = rememberSaveable { mutableStateOf(false) }
-    val timePickerState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0,
-        is24Hour = true
-    )
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Formulario de Usuario") }) }
@@ -216,6 +215,19 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
                         accessPassword = passwordState.value.text
                     )
 
+                    // Guardar el usuario en la base de datos
+                    val newId = dbHelper.createUser(newUser)
+                    // Limpiar los campos después de guardar
+                    nameState.value = TextFieldValue("")
+                    emailState.value = TextFieldValue("")
+                    phoneState.value = TextFieldValue("")
+                    usernameState.value = TextFieldValue("")
+                    passwordState.value = TextFieldValue("")
+                    birthDateState.value = LocalDate.of(2000, 1, 1) // Restablecer a la fecha predeterminada
+
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Usuario guardado correctamente ${newId}")
+                    }
 
 
                 },
