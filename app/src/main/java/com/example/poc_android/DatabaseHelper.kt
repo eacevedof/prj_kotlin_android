@@ -93,9 +93,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     fun getUserById(userId: Long): User? {
         val db = this.readableDatabase
         val cursor = db.query(
-            "users",
-            arrayOf("id", "name", "birthDate", "email", "phone", "username", "accessPassword"),
-            "id = ?",
+            TABLE_USERS,
+            null, // Todas las columnas
+            "$COLUMN_ID=?",
             arrayOf(userId.toString()),
             null, null, null
         )
