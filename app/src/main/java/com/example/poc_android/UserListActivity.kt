@@ -5,50 +5,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
-import android.widget.DatePicker
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.lifecycleScope
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Date
-import java.util.TimeZone
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -64,14 +37,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.ActivityResult
 
 class UserListActivity : ComponentActivity() {
 
     private lateinit var dbHelper: DatabaseHelper
     //ActivityResultLauncher
     private val editUserLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result ->
             if (result.resultCode == RESULT_OK) {
                 // Actualizar la lista de usuarios después de la edición
                 loadUsers()
@@ -176,10 +149,10 @@ class UserListActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { // Añadir un click listener a la Card
-                    val intent = Intent(context, UserUpdateActivity::class.java)
-                    intent.putExtra("USER_ID", user.id) // Pasar el ID del usuario
+                    val intentUserUpdate = Intent(context, UserUpdateActivity::class.java)
+                    intentUserUpdate.putExtra("USER_ID", user.id) // Pasar el ID del usuario
                     //context.startActivity(intent)
-                    editUserLauncher.launch(intent)
+                    editUserLauncher.launch(intentUserUpdate)
                 },
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
         ) {
