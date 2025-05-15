@@ -92,6 +92,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     }
 
     fun getUserByUserId(userId: Long): User? {
+        Log.d("DatabaseHelper", "getUserByUserId user-id: $userId")
         val db = this.readableDatabase
         val cursor = db.query(
             TABLE_USERS,
@@ -100,21 +101,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
             arrayOf(userId.toString()),
             null, null, null
         )
+
         if (cursor.count == 0) {
             cursor.close()
-            Log.d("DatabaseHelper", "No user found with user-id: $userId")
+            Log.d("DatabaseHelper", "getUserByUserId user-id: $userId not found")
             return null
         }
 
+        cursor.moveToFirst()
+        //id, uuid, name, birth_date, email, phone, username, access_password
         val user = User(
             id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
             uuid = cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
             name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
-            birthDate = Date(cursor.getLong(cursor.getColumnIndexOrThrow("birthDate"))),
+            birthDate = Date(cursor.getLong(cursor.getColumnIndexOrThrow("birth_date"))),
             email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
             phone = cursor.getString(cursor.getColumnIndexOrThrow("phone")),
             username = cursor.getString(cursor.getColumnIndexOrThrow("username")),
-            accessPassword = cursor.getString(cursor.getColumnIndexOrThrow("accessPassword"))
+            accessPassword = cursor.getString(cursor.getColumnIndexOrThrow("access_password"))
         )
 
         cursor.close()

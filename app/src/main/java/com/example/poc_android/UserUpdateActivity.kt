@@ -48,7 +48,7 @@ class UserUpdateActivity : ComponentActivity() {
         this.dbHelper = DatabaseHelper(this)
         // Obtener el ID del usuario del intent
         this.userId = intent.getLongExtra("USER_ID", -1)
-        Log.d("UserUpdateActivity.onCreate", "User ID: $userId") // Para depuración
+        Log.d("UserUpdateActivity.onCreate", "User ID: ${this.userId}") // Para depuración
         if (this.userId == -1L) {
             // Manejar el error si no se proporciona el ID
             this.finish() // Cerrar la actividad si no hay ID
@@ -111,31 +111,38 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
     // Cargar los datos del usuario al inicio
     Log.d("UserUpdateActivity", "LaunchedEffect user-id: $userId")
     LaunchedEffect(userId) {
+        Log.d("UserUpdateActivity", "user-id: dentro de launchedEffect")
         coroutineScope.launch(Dispatchers.IO) {
+            Log.d("UserUpdateActivity", "user-id: dentro de coroutineScope")
             val user = dbHelper.getUserByUserId(userId)
+            if (user==null) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Usuario no encontrado")
+                }
+                //sleep 5 seconds
+                Log.d("UserUpdateActivity", "user-id: Usuario no encontrado sleeping")
+                kotlinx.coroutines.delay(5000)
+                context.finish()
+                //volver a mostrar el listado de usuarios
+                val intent = Intent(context, UserListActivity::class.java) // Usar el contexto
+                context.startActivity(intent)
+                //exit this context
+                return@launch
+            }
 
             withContext(Dispatchers.Main) {
-                if (user != null) {
-                    nameState.value = TextFieldValue(user.name)
-                    birthDateState.value =
-                        Instant.ofEpochMilli(user.birthDate.time).atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-                    emailState.value = TextFieldValue(user.email)
-                    phoneState.value = TextFieldValue(user.phone)
-                    usernameState.value = TextFieldValue(user.username)
-                    passwordState.value =
-                        TextFieldValue(user.accessPassword) // Cargar la contraseña
-                }
-                else {
-                    // Manejar el caso en que el usuario no existe
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Usuario no encontrado")
-                    }
-                    context.finish() // Cerrar la actividad
-                }
-            }
-        }
-    }
+                nameState.value = TextFieldValue(user.name)
+                birthDateState.value =
+                Instant.ofEpochMilli(user.birthDate.time).atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                emailState.value = TextFieldValue(user.email)
+                phoneState.value = TextFieldValue(user.phone)
+                usernameState.value = TextFieldValue(user.username)
+                passwordState.value =
+                TextFieldValue(user.accessPassword) // Cargar la contraseña
+            }// withcontext
+        }//coroutineScope
+    }//LaunchedEffect
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Editar Usuario") }) },
