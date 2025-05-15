@@ -175,7 +175,9 @@ fun UserUpdateScreen(dbHelper: DatabaseHelper, userId: Long, context: ComponentA
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar("Usuario actualizado")
                                 }
-                                    context.finish() // Cerrar la actividad después de la actualización
+                                val intent = Intent(context, UserListActivity::class.java) // Usar el contexto
+                                context.startActivity(intent)
+                                context.finish() // Cerrar la actividad después de la actualización
                             }
                         }
                     },
