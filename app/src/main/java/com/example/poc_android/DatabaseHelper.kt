@@ -72,8 +72,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
             arrayOf(uuid),
             null, null, null
         )
+        if (cursor == null) {
+            return null
+        }
+
         var user: User? = null
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             user = cursor.getUserFromCursor()
         }
         cursor?.close()
@@ -84,14 +88,25 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     fun getAllUsers(): MutableList<User> {
         val userList = mutableListOf<User>()
         val db = this.readableDatabase
-        val cursor = db.query(TABLE_USERS, null, null, null, null, null, null)
+        val cursor = db.query(
+            TABLE_USERS, null,
+            null, null,
+            null, null,
+            null
+        )
 
-        cursor?.moveToFirst()?.let {
+        if (cursor.count == 0) {
+            return userList
+        }
+
+        if (cursor.moveToFirst()) {
             do {
                 userList.add(cursor.getUserFromCursor())
-            } while (cursor.moveToNext())
+            }
+            while (cursor.moveToNext())
         }
-        cursor?.close()
+
+        cursor.close()
         db.close()
         return userList
     }
