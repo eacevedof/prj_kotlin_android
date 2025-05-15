@@ -37,12 +37,16 @@ class MainActivity : ComponentActivity() {
         val birthDate = Calendar.getInstance().apply {
             set(1990, Calendar.JANUARY, 15) // Year, Month (0-indexed), Day
         }.time
+        val uuid = java.util.UUID.randomUUID().toString()
+        // get random mumber between 1 and 1000
+        val randomNumber = (1..1000).random()
         val newUser = User(
+            uuid = uuid,
             name = "John Doe",
             birthDate = birthDate,
             email = "john.doe@example.com",
             phone = "123-456-7890",
-            username = "johndoe",
+            username = "johndoe-${randomNumber}",
             accessPassword = "password123"
         )
         val id = dbHelper.createUser(newUser)

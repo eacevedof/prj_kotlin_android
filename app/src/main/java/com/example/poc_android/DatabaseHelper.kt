@@ -45,8 +45,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
 
-    // CRUD Operations
-
     fun createUser(user: User): Long {
         val db = this.writableDatabase
         val values = ContentValues().apply {
