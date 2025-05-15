@@ -42,6 +42,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.TimeZone
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 
 class MainActivity : ComponentActivity() {
 
@@ -65,19 +67,30 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserFormScreen(dbHelper: DatabaseHelper) {
+
+    val TextFieldValueSaver = listSaver<TextFieldValue, Any>(
+        save = { listOf(it.text, it.selection.start, it.selection.end) },
+        restore = {
+            TextFieldValue(
+                text = it[0] as String,
+                selection = androidx.compose.ui.text.TextRange(it[1] as Int, it[2] as Int)
+            )
+        }
+    )
+
     // Define los estados para los campos del formulario
-    val nameState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val birthDateState = rememberSaveable { mutableStateOf(LocalDate.now()) }
-    val emailState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val phoneState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val usernameState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    val passwordState = rememberSaveable { mutableStateOf(TextFieldValue("")) }
+    val birthDateState = rememberSaveable { mutableStateOf(LocalDate.of(2000, 1, 1)) }
+    val nameState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val emailState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val phoneState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val usernameState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
+    val passwordState = rememberSaveable(stateSaver = TextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
 
     //Para el DatePicker
     val openDialog = rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = birthDateState.value.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-        yearRange = 1900..2024
+        yearRange = 1900..2025 // Ahora incluye 2025
     )
 
     // Para el TimePicker (aunque no se usa directamente en el ejemplo de la fecha de nacimiento, se deja como referencia)
