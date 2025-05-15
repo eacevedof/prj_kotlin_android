@@ -1,5 +1,6 @@
 package com.example.poc_android
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,6 +50,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import android.util.Log
+import androidx.compose.material3.SnackbarHost
 
 class MainActivity : ComponentActivity() {
 
@@ -59,7 +61,7 @@ class MainActivity : ComponentActivity() {
         dbHelper = DatabaseHelper(this)
 
         setContent {
-            UserFormScreen(dbHelper = dbHelper)
+            UserFormScreen(dbHelper = dbHelper, this) // Pass the context
         }
     }
 
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserFormScreen(dbHelper: DatabaseHelper) {
+fun UserFormScreen(dbHelper: DatabaseHelper, context: ComponentActivity) { // Recibe el contexto
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -103,9 +105,20 @@ fun UserFormScreen(dbHelper: DatabaseHelper) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Formulario de Usuario") }) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = { // Botón en la parte inferior
+            Button(
+                onClick = {
+                    val intent = Intent(context, UserListActivity::class.java) // Usa el contexto
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Ver Lista de Usuarios")
+            }
+        }
     ) { paddingValues ->
-
-
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -252,5 +265,5 @@ fun DefaultPreview() {
     // Puedes crear una instancia temporal para la vista previa, pero no guardará datos reales.
     val context = androidx.compose.ui.platform.LocalContext.current
     val tempDbHelper = remember { DatabaseHelper(context) }
-    UserFormScreen(dbHelper = tempDbHelper)
+    UserFormScreen(dbHelper = tempDbHelper, context = context as ComponentActivity)
 }
