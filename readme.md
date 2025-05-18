@@ -1,5 +1,7 @@
 #### Curso Completo de Kotlin Multiplatform: Desarrolla Apps para Android y iOS
 - https://www.youtube.com/watch?v=F0AWKPSDbHo&t=2590s
+- jetpack compose, generador de vistas declarativas
+  - https://devexpert.io/compose-expert/?utm_source=youtube&utm_medium=social&utm_campaign=cursokmp&utm_content=description 
 
 - crear proyecto según tipologia:
   - [Kotlin Multiplatform Wizard](https://kmp.jetbrains.com/?android=true&ios=true&iosui=compose&includeTests=true) 
