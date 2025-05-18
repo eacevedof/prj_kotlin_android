@@ -1,5 +1,7 @@
 package io.devexpert.kmpmovies
 
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,8 +27,6 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.ImageLoader
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
