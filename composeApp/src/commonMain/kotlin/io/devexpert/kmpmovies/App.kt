@@ -22,6 +22,8 @@ fun App() {
             .logger(DebugLogger()) //por si hay problemas poder verlo en los logs
             .build()
     }
+
+    //https://youtu.be/F0AWKPSDbHo?t=1576
     HomeScreen()
 }
 
