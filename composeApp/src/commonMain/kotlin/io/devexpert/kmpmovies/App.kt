@@ -2,7 +2,6 @@ package io.devexpert.kmpmovies
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,10 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+
 import coil3.compose.AsyncImage
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.ImageLoader
+import coil3.request.crossfade
+import coil3.util.DebugLogger
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import io.devexpert.kmpmovies.Movie
-import io.devexpert.kmpmovies.movies
 
 @Composable
 @Preview
@@ -31,6 +34,16 @@ fun App() {
     //jetpack compose: ruta de entrada de compose-mt, todo lo que hagamos aqui sera multiplataforma
     //internamente cada plataforma lo compilará a nativo
     MaterialTheme {
+
+        //import coil3.compose.setSingletonImageLoaderFactory
+        // setea un imageloader global para que lo use  asyncImage cada vez que lo necesite.
+        setSingletonImageLoaderFactory { context ->
+            ImageLoader.Builder(context)
+                .crossfade(true)
+                .logger(DebugLogger()) //por si hay problemas poder verlo en los logs
+                .build()
+        }
+
         //surface permitie configurar los colores de la ui segun dispositivo, tema claro u oscuro
         Surface (modifier = Modifier.fillMaxSize()) {
             LazyVerticalGrid(
@@ -53,6 +66,7 @@ fun App() {
 @Composable
 fun MovieItem(movie: Movie) {
     Column {
+        // import coil3.compose.AsyncImage
         AsyncImage(
             model = movie.poster,
             contentDescription = movie.title,
