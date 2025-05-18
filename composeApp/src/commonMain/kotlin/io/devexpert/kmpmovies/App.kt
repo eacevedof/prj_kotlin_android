@@ -18,7 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import io.devexpert.kmpmovies.Movie
 import io.devexpert.kmpmovies.movies
@@ -51,12 +53,14 @@ fun App() {
 @Composable
 fun MovieItem(movie: Movie) {
     Column {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2 /3f) //con esto siempre mantendra una altura con la anchura
+        AsyncImage(
+            model = movie.poster,
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxWidth()
+                .aspectRatio(2f / 3f)
                 .clip(MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.surface)
         )
         Text (
             text = movie.title,
