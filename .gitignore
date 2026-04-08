@@ -1,12 +1,38 @@
-*.iml
-.kotlin
-.gradle
-**/build/
-xcuserdata
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
 !src/**/build/
-local.properties
-.idea
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Kotlin
+.kotlin/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+local.properties
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+out/
+target/
+
+# iOS/Xcode
+xcuserdata
 captures
 .externalNativeBuild
 .cxx
