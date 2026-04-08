@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.coil.compose)
             implementation("io.coil-kt.coil3:coil-network-ktor3:3.2.0")
             implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.datetime)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
